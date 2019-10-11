@@ -1,0 +1,52 @@
+.home-page{
+  min-height:100% ;
+  .list-header{
+    height: 80rpx;
+    position: relative;
+    img{
+      margin-left:30rpx;
+      width:80rpx;
+      height: 80rpx;
+      float:left;
+      border-radius: 50%;
+    }
+    span{
+      display: block;
+      margin-left:30rpx;
+      float:left;
+      line-height: 80rpx;
+    }
+    div{
+      float:right;
+      margin-right:30rpx;
+      position: absolute;
+      top:52%;
+      right:0;
+      transform: translate(0,-50%)
+    }
+  }
+  .list-body{
+    .img-box{
+      p{
+        box-sizing: border-box;
+        padding:0 20rpx;
+        font-size:34rpx;
+      }
+      .content-image{
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+      }
+      
+      
+      img{
+        height: auto;
+      }
+      video{
+        width:100%;
+      }
+    }
+    
+  }
+}
