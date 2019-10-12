@@ -11,14 +11,13 @@
             <div class="iconfont-box">
               <i 
                 @click="showUserDetails(index)"
-                v-if="showDialog == false"
+                v-if="item.singleShowDialog == false"
                 class="iconfont .icon-jiantou">
               </i>
               <i 
-                v-if="showDialog == true"
+                v-if="item.singleShowDialog == true"
                 class="iconfont .icon-jiantou_up">
               </i>
-
             </div>
           </div>
           <div 
@@ -52,11 +51,54 @@
               </div>
               
           </div>
+          <div 
+            class="top-comment" 
+            v-if="item.top_commentsName">
+              <div class="top-comment-header">
+                <img :src="item.top_commentsHeader">
+                <span>
+                  {{item.top_commentsName}}
+                </span>
+              </div>
+              <div class="top-comment-body">
+                {{item.top_commentsContent}}
+              </div>
+          </div>
+          <div class="list-footer">
+              <div>
+                <i class=".icon-zan iconfont">
+                </i>
+                <span v-if="item.up < 10000">
+                  {{item.up}}
+                </span>
+                <span v-if="item.up >= 10000">
+                  {{item.up.slice(0,-4) + 'k' }}
+                </span>
+              </div>
+              <div>
+                <i class=".icon-cai iconfont">
+                </i>
+                <span>
+                  {{item.down}}
+                </span>
+              </div>
+              <div>
+                <i class=".icon-pinglun iconfont">
+                </i>
+                <span>
+                  {{item.comment}}
+                </span>
+              </div>
+              <div>
+                <i class=".icon-fenxiang iconfont">
+                </i>
+                <span>分享</span>
+              </div>
+          </div>
           <dia-log 
             @close="onCLose"
             @closeAndCut="cutOne"
             :showDialog='showDialog'>
-            
           </dia-log>
           
           
@@ -66,7 +108,7 @@
 </template>
 <script>
  
- import diaLog from './components/dialog'
+import diaLog from './components/dialog'
 export default {
   data(){
     return {
@@ -92,15 +134,22 @@ export default {
         },
         success(res){
           console.log(res)
-          _this.dataList = res.data.data.slice(0,5)
+          _this.dataList = res.data.data.slice(0,1);
+          _this.dataList.map(item =>{
+            _this.$set(item,'singleShowDialog',false)
+          })
+          console.log("pdd",_this.dataList)
+
           wx.stopPullDownRefresh() // 终止下拉刷新
           wx.hideNavigationBarLoading() // 收起加载动画
         }
       })
     },
+    // 使对author评价弹框出现
+
     showUserDetails(index){
-      
       this.showDialog = true
+      this.$set(this.dataList[index],'singleShowDialog',true)
       this.nowIndex = index
       console.log("点击了")
         // 告知弹框
@@ -127,11 +176,16 @@ export default {
       //   }
       // })
     },
+    // 不对author弹框做操作，直接关闭
     onCLose(){
       this.showDialog = false
+      this.$set(this.dataList[this.nowIndex],'singleShowDialog',false)
     },
+    // 自定义函数
+    // 对author弹框做出相关操作，关闭弹框，并且使名字后的箭头恢复
     cutOne(){
       this.showDialog = false
+      
       this.dataList.splice(this.nowIndex,1)
     }
   },

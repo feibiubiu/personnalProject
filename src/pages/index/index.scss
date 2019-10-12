@@ -1,5 +1,11 @@
+.verticalCenter{
+  position: absolute;
+  top:50%;
+  transform: translate(0,-50%);
+}
 .home-page{
   min-height:100% ;
+  
   .list-header{
     height: 80rpx;
     position: relative;
@@ -29,7 +35,7 @@
     .img-box{
       p{
         box-sizing: border-box;
-        padding:0 20rpx;
+        padding:0 30rpx;
         font-size:34rpx;
       }
       .content-image{
@@ -48,5 +54,46 @@
       }
     }
     
+  }
+  .top-comment{
+    
+    padding: 0 20rpx;
+    .top-comment-header{
+      background: #eee;
+      position: relative;
+      height: 70rpx;
+      img{
+        margin-left: 10rpx;
+        width:50rpx;
+        height: 50rpx;
+        border-radius: 50%;
+      }
+      span{
+        @extend .verticalCenter;
+        left:100rpx;
+      }
+    }
+    .top-comment-body{
+      box-sizing: border-box;
+      padding:0 10rpx;
+      background: #eee;
+    }
+  }
+  .list-footer{
+    display: flex;
+    margin-top:20rpx;
+    div{
+      flex:1;
+      margin: 0 35rpx;
+      height:44rpx;
+      line-height: 44rpx;
+      i{
+        float:left;
+        font-size:36rpx;
+      }
+      span{
+        float:left;
+      }
+    }
   }
 }
