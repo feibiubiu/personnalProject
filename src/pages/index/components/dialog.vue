@@ -15,7 +15,6 @@
           </li>
         </ul>
     </van-popup>
-   
   </div>
 </template>
 <script>
@@ -35,7 +34,6 @@ export default {
       this.$emit("close")
     },
     doAuthor(index){
-      
       this.$emit("closeAndCut");
     }
   },

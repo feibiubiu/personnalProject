@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/main",
     "pages/logs/main",
-    "pages/counter/main"
+    "pages/counter/main",
+    "pages/topcomment/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -23,6 +24,7 @@
     "van-tabs": "/static/vant/tabs/index",
     "van-field": "/static/vant/field/index",
     "van-cell-group": "/static/vant/cell-group/index"
+
   },
   "tabBar": {
     "color": "#999",

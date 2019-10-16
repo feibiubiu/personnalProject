@@ -1,8 +1,22 @@
 <template>
-  <div 
-    
-    class="home-page">
-      <div 
+  <div class="home-page">
+    <!-- 首页头部导航栏 -->
+      <div class="page-tabbar">
+        <scroll-view class="scroll-view" :scroll-x="true" :enable-flex="true">
+          <span
+            :class="{'active':index==idx}"
+            @click="changeIndex(idx)"
+            class="scroll-view-item" 
+            v-for="(item,idx) in contentTypeList"
+            :key="idx">
+              {{item}}
+          </span>
+        </scroll-view>
+        <div class="search-box">
+          <i class="iconfont icon-ai219"></i>
+        </div>
+      </div>
+      <!-- <div 
         v-for="(item,index) in dataList" 
         :key="index">
           <div class="list-header">
@@ -25,11 +39,13 @@
               <div 
                 class="img-box">
                 <p 
+                  @click.stop = "gotoComment(item.soureid)"
                   class="content-image"
                   v-if="item.type == 'image' || item.type == 'gif' || item.type == 'video'">
                     {{item.text}}
                 </p>
                 <p
+                  @click.stop = "gotoComment(item.soureid)"
                   class="content-text"
                   v-if="item.type == 'text'">
                     {{item.text}}
@@ -99,54 +115,86 @@
             @close="onCLose"
             @closeAndCut="cutOne"
             :showDialog='showDialog'>
-          </dia-log>
-          
-          
-      </div>
-     
+          </dia-log>  
+      </div> -->
+    <!-- 神评版本 -->
+    
+      <my-recommend 
+        :data="dataList"
+        v-if='index==0'>
+
+      </my-recommend>
+      <my-text v-if = 'index == 1'>
+
+      </my-text>
+      <my-video v-if = 'index == 2'>
+
+      </my-video>
+      <my-photo v-if = 'index == 3'>
+
+      </my-photo>
+
   </div>
 </template>
 <script>
- 
+import myRecommend from './components/recommend/recommend'
+import myText from './components/text/text'
+import myVideo from './components/video/video'
+import myPhoto from './components/photo/photo'
 import diaLog from './components/dialog'
 export default {
   data(){
     return {
+      name:'home',// 首页
+      index:3,
+      contentType:1,
       dataList:[],
       showDialog:false,
-      nowIndex:''
+      nowIndex:'',
+      contentTypeList:['推荐（神评）','文字','视频','图片','关注','游戏','放映厅']  // 内容的类型  1 全部 2文字 3图片 4视频
     }
   },
   components:{
-    diaLog
+    diaLog,
+    myRecommend,
+    myText,
+    myVideo,
+    myPhoto
   },
   created(){
-    this.getData();
+    this.changeIndex();
   },
   methods:{
-    getData(){
-      let _this = this;
-      wx.request({
-        url: 'https://www.apiopen.top/satinGodApi', 
-        data: {
-          type:1,
-          page:1
-        },
-        success(res){
-          console.log(res)
-          _this.dataList = res.data.data.slice(0,1);
-          _this.dataList.map(item =>{
-            _this.$set(item,'singleShowDialog',false)
-          })
-          console.log("pdd",_this.dataList)
+    changeIndex(index){
+      console.log("index",index)
+      this.index = index || 3
+      index == 0?this.index = 0: 0
+    },
 
-          wx.stopPullDownRefresh() // 终止下拉刷新
-          wx.hideNavigationBarLoading() // 收起加载动画
+    // 以下为保存
+    gotoComment(soureid){
+      console.log("ssss",soureid)
+      wx.navigateTo({
+        url: `../topcomment/main?soureid=${soureid}`,
+        
+        // events: {
+        //   // 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
+        //   acceptDataFromOpenedPage: function(data) {
+        //     console.log(data)
+        //   },
+        //   someEvent: function(data) {
+        //     console.log(data)
+        //   }
+        //   ...
+        // },
+        success: function(res) {
+          console.log("成功了",res)
+          // 通过eventChannel向被打开页面传送数据
+          //res.eventChannel.emit('acceptDataFromOpenerPage', { data: 'test',soureid })
         }
       })
     },
     // 使对author评价弹框出现
-
     showUserDetails(index){
       this.showDialog = true
       this.$set(this.dataList[index],'singleShowDialog',true)
@@ -182,23 +230,18 @@ export default {
       this.$set(this.dataList[this.nowIndex],'singleShowDialog',false)
     },
     // 自定义函数
-    // 对author弹框做出相关操作，关闭弹框，并且使名字后的箭头恢复
+    // 对author弹框做出相关操作，关闭弹框，并且使名字后的箭头恢复,并删除当前条数据
     cutOne(){
       this.showDialog = false
-      
       this.dataList.splice(this.nowIndex,1)
     }
   },
   
+  
 
-  // 下拉刷新
-  onPullDownRefresh () {
-    console.log('下拉')
-    this.getData()
-  },
+  
 }
 </script>
 <style lang='scss'>
-  
   @import './index.scss'
 </style>

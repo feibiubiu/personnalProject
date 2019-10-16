@@ -1,0 +1,18 @@
+.mod-photo{
+    //水平、垂直居中
+  .tocenter{
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+  }
+  margin-top:60rpx;
+  .content-text{
+    padding:0 30rpx;
+    margin: 10rpx 0;
+  }
+  image{
+    width:100%;
+  }
+  
+}
