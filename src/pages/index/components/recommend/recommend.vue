@@ -152,9 +152,6 @@ export default {
               _this.$set(item,'singleShowDialog',false)
               _this.dataList.push(item);
             })
-            
-            
-            
             _this.page++;
             console.log("this.page",_this.page,_this.dataList)
             wx.stopPullDownRefresh() // 终止下拉刷新

@@ -196,7 +196,7 @@
     },
     // 获取滚动条的位置
     onPageScroll:function(e){ // 获取滚动条当前位置
-      
+      return   
       if(this.timer){
         clearTimeout(this.timer) 
       }

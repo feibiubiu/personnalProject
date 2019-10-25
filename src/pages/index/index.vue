@@ -19,9 +19,9 @@
 
       <my-recommend v-if ='index == 0' :dataList="recommendList">
       </my-recommend>
-      <my-text v-if = 'index == 1'>
+      <my-text v-if = 'index == 1' :dataList="textList">
       </my-text>
-      <my-video v-if = 'index == 2'>
+      <my-video v-if = 'index == 2' :dataList="videoList">
       </my-video>
       <my-photo v-if = 'index == 3' :dataList="imgList">
       </my-photo>
@@ -45,12 +45,14 @@ export default {
       dataList:[],
       showDialog:false,
       nowIndex:'',
-      contentTypeList:['推荐（神评）','文字','视频','图片','关注','游戏','放映厅'] , // 内容的类型  1 全部 2文字 3图片 4视频
+      contentTypeList:['推荐（神评）','文字','视频','图片'] , // 内容的类型  1 全部 2文字 3图片 4视频
       isConnected:null,  // 网络是否联网
       networkType:null,
       ////////
       imgList:[],
-      recommendList:[]
+      recommendList:[],
+      textList:[],
+      videoList:[]
     }
   },
   components:{
@@ -87,7 +89,7 @@ export default {
     // 改变index值，切换查看段子类型
     changeIndex(index){
       console.log("index",index)
-      this.index = index || 3
+      this.index = index || 0
       index == 0?this.index = 0: 0
 
         let _this = this;
@@ -96,9 +98,14 @@ export default {
           this.imgRequest();
           console.log("执行index 3")
         }else if(this.index == 0 && this.recommendList.length == 0){
-          
           this.recommendRequest();
           console.log("执行index 0")
+        }else if(this.index == 1 && this.textList.length == 0){
+          this.textRequest();
+          console.log("执行index 1")
+        }else if(this.index == 2 && this.videoList.length == 0){
+          this.videoRequest();
+          console.log("执行index 2")
         }
         
         /////////////
@@ -147,7 +154,42 @@ export default {
         }
       })
     },
-
+    //  请求文字类型段子函数
+    textRequest(){
+      let _this = this;
+      wx.request({
+        url: 'https://api.apiopen.top/getJoke', 
+        data: {
+          type:'text',
+          page:1,
+          count:10
+        },
+        success(res){
+          _this.textList = res.data.result;
+          _this.textList.map(item =>{
+            _this.$set(item,'singleShowDialog',false)
+          })
+        }
+      })
+    },
+    //  请求视频类型段子函数
+    videoRequest(){
+      let _this = this;
+      wx.request({
+        url: 'https://api.apiopen.top/getJoke', 
+        data: {
+          type:'video',
+          page:1,
+          count:5
+        },
+        success(res){
+          _this.videoList = res.data.result;
+          _this.videoList.map(item =>{
+            _this.$set(item,'singleShowDialog',false)
+          })
+        }
+      })
+    },
     // 以下为保存
     gotoComment(soureid){
       console.log("ssss",soureid)
