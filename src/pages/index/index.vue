@@ -1,6 +1,6 @@
 <template>
   <div class="home-page">
-    <!-- 首页头部导航栏 -->
+    <!-- 导航栏头部 -->
       <div class="page-tabbar">
         <scroll-view class="scroll-view" :scroll-x="true" :enable-flex="true">
           <span
@@ -16,125 +16,19 @@
           <i class="iconfont icon-ai219"></i>
         </div>
       </div>
-      <!-- <div 
-        v-for="(item,index) in dataList" 
-        :key="index">
-          <div class="list-header">
-            <img :src="item.header" alt="">
-            <span>{{item.username}}</span>
-            <div class="iconfont-box">
-              <i 
-                @click="showUserDetails(index)"
-                v-if="item.singleShowDialog == false"
-                class="iconfont .icon-jiantou">
-              </i>
-              <i 
-                v-if="item.singleShowDialog == true"
-                class="iconfont .icon-jiantou_up">
-              </i>
-            </div>
-          </div>
-          <div 
-            class="list-body">
-              <div 
-                class="img-box">
-                <p 
-                  @click.stop = "gotoComment(item.soureid)"
-                  class="content-image"
-                  v-if="item.type == 'image' || item.type == 'gif' || item.type == 'video'">
-                    {{item.text}}
-                </p>
-                <p
-                  @click.stop = "gotoComment(item.soureid)"
-                  class="content-text"
-                  v-if="item.type == 'text'">
-                    {{item.text}}
-                </p>
-                <img 
-                  v-if="item.type == 'image'"
-                  :src="item.image" />
-                <img 
-                  v-if="item.type == 'gif'"
-                  :src="item.gif" />  
-                <video 
-                  v-if="item.type == 'video'"
-                  :src="item.video" 
-                  object-fit="contain"
-                  show-mute-btn="true"
-                  initial-time="0.1"
-                  controls="controls">
-                </video>
-              </div>
-              
-          </div>
-          <div 
-            class="top-comment" 
-            v-if="item.top_commentsName">
-              <div class="top-comment-header">
-                <img :src="item.top_commentsHeader">
-                <span>
-                  {{item.top_commentsName}}
-                </span>
-              </div>
-              <div class="top-comment-body">
-                {{item.top_commentsContent}}
-              </div>
-          </div>
-          <div class="list-footer">
-              <div>
-                <i class=".icon-zan iconfont">
-                </i>
-                <span v-if="item.up < 10000">
-                  {{item.up}}
-                </span>
-                <span v-if="item.up >= 10000">
-                  {{item.up.slice(0,-4) + 'k' }}
-                </span>
-              </div>
-              <div>
-                <i class=".icon-cai iconfont">
-                </i>
-                <span>
-                  {{item.down}}
-                </span>
-              </div>
-              <div>
-                <i class=".icon-pinglun iconfont">
-                </i>
-                <span>
-                  {{item.comment}}
-                </span>
-              </div>
-              <div>
-                <i class=".icon-fenxiang iconfont">
-                </i>
-                <span>分享</span>
-              </div>
-          </div>
-          <dia-log 
-            @close="onCLose"
-            @closeAndCut="cutOne"
-            :showDialog='showDialog'>
-          </dia-log>  
-      </div> -->
-    <!-- 神评版本 -->
-    
-      <my-recommend 
-        :data="dataList"
-        v-if='index==0'>
 
+      <my-recommend v-if ='index == 0' :dataList="recommendList">
       </my-recommend>
       <my-text v-if = 'index == 1'>
-
       </my-text>
       <my-video v-if = 'index == 2'>
-
       </my-video>
-      <my-photo v-if = 'index == 3'>
-
+      <my-photo v-if = 'index == 3' :dataList="imgList">
       </my-photo>
 
   </div>
+ 
+ 
 </template>
 <script>
 import myRecommend from './components/recommend/recommend'
@@ -151,7 +45,12 @@ export default {
       dataList:[],
       showDialog:false,
       nowIndex:'',
-      contentTypeList:['推荐（神评）','文字','视频','图片','关注','游戏','放映厅']  // 内容的类型  1 全部 2文字 3图片 4视频
+      contentTypeList:['推荐（神评）','文字','视频','图片','关注','游戏','放映厅'] , // 内容的类型  1 全部 2文字 3图片 4视频
+      isConnected:null,  // 网络是否联网
+      networkType:null,
+      ////////
+      imgList:[],
+      recommendList:[]
     }
   },
   components:{
@@ -162,13 +61,91 @@ export default {
     myPhoto
   },
   created(){
+  
+    let _this = this;
     this.changeIndex();
+    // 刚进入页面的时候，获取网络状态
+    wx.getNetworkType({
+      success (res) {
+        if(res.networkType=='none'){
+          wx.showToast({
+            title: '当前无网络连接',
+            icon: 'none',
+            duration: 2000
+          })
+        }
+      }
+    })
+    // 长期监听网络状态的改变
+    wx.onNetworkStatusChange(function (res){
+      console.log('res',res)
+       _this.isConnected = res.isConnected;
+       _this.networkType = res.networkType;
+    })
   },
   methods:{
+    // 改变index值，切换查看段子类型
     changeIndex(index){
       console.log("index",index)
       this.index = index || 3
       index == 0?this.index = 0: 0
+
+        let _this = this;
+        if(this.index == 3 && this.imgList.length == 0){
+          
+          this.imgRequest();
+          console.log("执行index 3")
+        }else if(this.index == 0 && this.recommendList.length == 0){
+          
+          this.recommendRequest();
+          console.log("执行index 0")
+        }
+        
+        /////////////
+    },
+    // 请求图片类型段子函数
+    imgRequest(){
+      let _this = this;
+      wx.request({
+        url: 'https://api.apiopen.top/getJoke', 
+        data: {
+          type:'image',
+          page:1,
+          count:5
+        },
+        success(res){
+          _this.imgList = res.data.result;
+          _this.imgList.map(item =>{
+            _this.$set(item,'singleShowDialog',false)
+          })
+        }
+      })
+    },
+    // 请求推荐（神评）类型段子函数
+    recommendRequest(){
+      let _this = this;
+      wx.request({
+        url: 'https://www.apiopen.top/satinGodApi', 
+        data: {
+          type:1,
+          page:1
+        },
+        success(res){
+          if(res && res.data.code == 200){
+            _this.recommendList = []; //下拉请求数据成功，清空旧数据
+            _this.recommendList =  res.data.data.slice(0,10);
+            _this.recommendList.map(item =>{
+              _this.$set(item,'singleShowDialog',false)
+            })
+          }else{
+            wx.showToast({
+              title: '数据请求有误，请刷新',
+              icon: 'success',
+              duration: 2000
+            })
+          }
+        }
+      })
     },
 
     // 以下为保存
@@ -234,9 +211,29 @@ export default {
     cutOne(){
       this.showDialog = false
       this.dataList.splice(this.nowIndex,1)
-    }
+    },
   },
-  
+  watch:{
+    isConnected:function(newt,old){
+      
+      if(newt == false){
+        wx.showToast({
+          title: '网络连接中断',
+          icon: 'none',
+          duration: 2000
+        })
+      }
+    },
+    networkType:function(newt,old){
+      if(newt != 'wifi'){
+        wx.showToast({
+          title: "当前网络为非WiFi，请注意流量的使用",
+          icon: 'none',
+          duration: 2000
+        })
+      }
+    }
+  }
   
 
   

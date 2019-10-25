@@ -6,6 +6,12 @@
     left:50%;
     transform: translate(-50%,-50%);
   }
+  .loading{
+    height: 60rpx;
+    text-align: center;
+    position:relative;
+    z-index: 100;
+  }
   margin-top:60rpx;
   .content-text{
     padding:0 30rpx;
@@ -14,5 +20,17 @@
   image{
     width:100%;
   }
-  
+  .ul-li{
+    width:60%;
+    background:white;
+    border-radius: 12rpx;
+    @extend .tocenter;
+    li{
+      height: 60rpx;
+      line-height: 60rpx;
+      border-bottom: 1px solid #ccc;
+      text-align: center;
+      
+    }
+  }
 }

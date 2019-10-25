@@ -3,8 +3,7 @@
     <img :src="item.header" alt="">
     <span>{{item.username}}</span>
     <span>{{item.name}}</span>
-    <div class="iconfont-box">
-      <!-- @click="showUserDetails(index)" -->
+    <div class="iconfont-box" @click="showUserDetails(index)">
       <!-- 缺一个展示用户对作者发布内容的处理 -->
       <i 
         v-if="item.singleShowDialog == false"
@@ -18,7 +17,9 @@
   </div>
 </template>
 <script>
+
 export default {
+  name:'', // 发布段子内容的用户头部
   data(){
     return {
       singleShowDialog:false
@@ -30,6 +31,19 @@ export default {
        required: true
     }
   },
+  methods:{
+    showUserDetails(){
+      console.log("猫猫猫")
+      console.log(this.item);
+      this.$set(this.item,'singleShowDialog',true)
+      
+      
+      this.$emit("showPupop")
+    },
+    close(){
+      this.singleShowDialog = false
+    }
+  }
   
 }
 </script>
@@ -38,6 +52,10 @@ export default {
     margin-top:50rpx;
     height: 80rpx;
     position: relative;
+    .iconfont-box{
+      width:60rpx;
+      height: 60rpx;
+    }
     img{
       margin-left:30rpx;
       width:80rpx;
