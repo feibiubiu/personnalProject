@@ -37,6 +37,7 @@ export default {
       isShowPopup:false,
       makeToAuthorList:["不感兴趣","屏蔽作者","内容重复","内容引起不适"],
       doIndex:'',
+      timer:null, // 函数防抖定时器
     }
   },
   components:{
@@ -48,6 +49,20 @@ export default {
       type:Array,
       required:true
     }
+  },
+  created(){
+    this.timer = 1;
+    console.log('video',this.$store.state.video.scrollDistance)
+    // 滚动条跳转回离开时的大致位置
+    wx.pageScrollTo({
+      scrollTop: this.$store.state.video.scrollDistance,
+      duration: 0
+    })
+    this.run = false;
+    setTimeout(() => {
+      this.run = true;
+      this.timer = null;
+    }, 1000);
   },
   methods:{
     getData(){
@@ -117,7 +132,22 @@ export default {
     }
     this.run = false;
     this.getData()
-  }
+  },
+  // 获取滚动条的位置
+  onPageScroll:function(e){ // 获取滚动条当前位置 
+    if(this.timer){
+      clearTimeout(this.timer) 
+      if(this.timer == 1){
+        return
+      }
+    }
+    this.timer = setTimeout(() => {
+      this.$store.commit({
+        type:'changeVideoScrollDistance',
+        scrollDistance:e.scrollTop
+      });
+    }, 500);   
+  },
 }
 </script>
 <style lang="scss">

@@ -1,7 +1,7 @@
 <template>
   <div class="home-page">
     <!-- 导航栏头部 -->
-      <div class="page-tabbar">
+      <div class="page-tabbar" >
         <scroll-view class="scroll-view" :scroll-x="true" :enable-flex="true">
           <span
             :class="{'active':index==idx}"
@@ -12,18 +12,18 @@
               {{item}}
           </span>
         </scroll-view>
-        <div class="search-box">
+        <div class="search-box" @click="search">
           <i class="iconfont icon-ai219"></i>
         </div>
       </div>
 
-      <my-recommend v-if ='index == 0' :dataList="recommendList">
+      <my-recommend v-if='index == 0' :dataList="recommendList" :index1="index" >
       </my-recommend>
-      <my-text v-if = 'index == 1' :dataList="textList">
+      <my-text v-if='index == 1' :dataList="textList" :index1="index">
       </my-text>
-      <my-video v-if = 'index == 2' :dataList="videoList">
+      <my-video v-if='index == 2' :dataList="videoList" :index1="index">
       </my-video>
-      <my-photo v-if = 'index == 3' :dataList="imgList">
+      <my-photo v-if='index == 3' :dataList="imgList" :index1="index">
       </my-photo>
 
   </div>
@@ -48,11 +48,11 @@ export default {
       contentTypeList:['推荐（神评）','文字','视频','图片'] , // 内容的类型  1 全部 2文字 3图片 4视频
       isConnected:null,  // 网络是否联网
       networkType:null,
-      ////////
       imgList:[],
       recommendList:[],
       textList:[],
-      videoList:[]
+      videoList:[],
+      statusBarHeight:wx.getSystemInfoSync()['statusBarHeight'] 
     }
   },
   components:{
@@ -63,7 +63,7 @@ export default {
     myPhoto
   },
   created(){
-  
+    
     let _this = this;
     this.changeIndex();
     // 刚进入页面的时候，获取网络状态
@@ -84,6 +84,9 @@ export default {
        _this.isConnected = res.isConnected;
        _this.networkType = res.networkType;
     })
+  },
+  mounted(){
+    console.log("statusBarHeight",this.statusBarHeight)
   },
   methods:{
     // 改变index值，切换查看段子类型
@@ -109,6 +112,12 @@ export default {
         }
         
         /////////////
+    },
+    search(){
+      console.log("搜索")
+      wx.navigateTo({
+        url: '../searchPage/main',
+      })
     },
     // 请求图片类型段子函数
     imgRequest(){
@@ -147,10 +156,17 @@ export default {
           }else{
             wx.showToast({
               title: '数据请求有误，请刷新',
-              icon: 'success',
+              icon: 'none',
               duration: 2000
             })
           }
+        },
+        fail(){
+          wx.showToast({
+            title: '数据请求失败，请刷新',
+            icon: 'none',
+            duration: 2000
+          })
         }
       })
     },
@@ -190,6 +206,7 @@ export default {
         }
       })
     },
+
     // 以下为保存
     gotoComment(soureid){
       console.log("ssss",soureid)

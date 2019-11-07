@@ -1,0 +1,29 @@
+// 垂直居中
+.verticalCenter{
+  position: absolute;
+  top:50%;
+  transform: translate(0%,-56%);
+  
+}
+.mod-search{
+  .title-search{
+    display: flex;
+    align-items: center;
+    input{
+     
+      margin-left: 10rpx;
+      height:48rpx;
+      margin-top:-10rpx;
+      border:1px solid #ddd;
+      border-radius: 15rpx;
+      padding-left:15rpx;
+    }
+    span{
+      display: block;
+      height:48rpx;
+      line-height: 48rpx;
+      margin-top:-10rpx;
+      margin-left: 10rpx;
+    }
+  }
+}

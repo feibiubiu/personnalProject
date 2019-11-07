@@ -1,16 +1,32 @@
 {
   "pages": [
-    "pages/index/main",
     "pages/music/main",
+    "pages/index/main",
     "pages/counter/main",
     "pages/duanziDetail/main",
-    "pages/topcomment/main"
+    "pages/topcomment/main",
+    "pages/searchPage/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "WeChat",
     "navigationBarTextStyle": "black"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序位置接口" 
+    }
+  },
+  "plugins": {
+    "routePlan": {
+      "version": "1.0.3",
+      "provider": "wx50b5593e81dd937a"
+    },
+    "subway": {
+      "version": "1.0.4",
+      "provider": "wx6aaf93c4435fa1c1"
+    }
   },
   "usingComponents": {
     "van-action-sheet": "/static/vant/action-sheet/index",

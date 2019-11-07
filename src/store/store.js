@@ -15,19 +15,54 @@ const photo = {
       state.page = payload.page
       
     },
-    changeScrollDistance(state,payload){
+    changePhotoScrollDistance(state,payload){
       state.scrollDistance = payload.scrollDistance;
-      console.log("执行了",state.scrollDistance)
-     
+      console.log("执行了photo",state.scrollDistance)
     }
-
   }
-  
+}
+const text = {
+  state:{
+    scrollDistance:0,
+  },
+  mutations:{
+    changeTextScrollDistance(state,payload){
+      state.scrollDistance = payload.scrollDistance;
+      console.log("执行了text",state.scrollDistance)
+    }
+  }
+}
+
+const video = {
+  state:{
+    scrollDistance:0,
+  },
+  mutations:{
+    changeVideoScrollDistance(state,payload){
+      state.scrollDistance = payload.scrollDistance;
+      console.log("执行了video",state.scrollDistance)
+    }
+  }
+}
+
+const recommend = {
+  state:{
+    scrollDistance:0,
+  },
+  mutations:{
+    changeRecommendScrollDistance(state,payload){
+      state.scrollDistance = payload.scrollDistance;
+      console.log("执行了recommend",state.scrollDistance)
+    }
+  }
 }
 
 const store = new Vuex.Store({
   modules: {
-    photo
+    photo,
+    text,
+    video,
+    recommend
   }
 })
 

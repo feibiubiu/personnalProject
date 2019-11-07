@@ -1,5 +1,5 @@
 <template>
-  <div class="mod-text">
+  <div class="mod-text"  >
     <div 
       v-for="(item,index) in dataList"
       :key="index">
@@ -11,7 +11,7 @@
             {{item.text}}
         </p>
     </div>
-    <my-popup :show="isShowPopup" @closePopup="closePopup">
+    <my-popup :show="isShowPopup" @closePopup="closePopup" v-if="isShowPopup">
       <ul class="ul-li">
         <li v-for="(item,index) in makeToAuthorList" :key="index" @click="shouUserDetail(index)">
           {{item}}
@@ -26,6 +26,12 @@
 
   import userHeader from '@/pages/components/userHeader/index.vue'
   import myPopup from '@/pages/components/popup/index.vue'
+  import QQMapWX from '@/map/qqmap-wx-jssdk.js'
+
+
+ 
+
+
 
   export default {
     data(){
@@ -36,12 +42,17 @@
         isShowPopup:false,
         makeToAuthorList:["不感兴趣","屏蔽作者","内容重复","内容引起不适"],
         doIndex:'',
-
+        timer:null, // 函数防抖定时器
+        
       }
     },
     props:{
       dataList:{
         type:Array,
+        required:true
+      },
+      index1:{
+        type:String || Number,
         required:true
       }
     },
@@ -49,8 +60,132 @@
       userHeader,
       myPopup
     },
-    
+    created(){
+      this.timer = 1;
+      console.log('text',this.$store.state.text.scrollDistance)
+      // 滚动条跳转回离开时的大致位置
+      wx.pageScrollTo({
+        scrollTop: this.$store.state.text.scrollDistance,
+        duration: 0
+      })
+      this.run = false;
+      setTimeout(() => {
+        this.run = true;
+        this.timer = null;
+      }, 1000);
+    },
+    mounted(){
+      
+      // 实例化API核心类
+      var qqmapsdk = new QQMapWX({
+          key: '6SNBZ-YSW6U-QS7VF-2Y72Y-HZJR6-A7BCO'
+      });
+      let _this = this;
+      wx.getSetting({
+      success: (res) => {
+        console.log("授权函数",res)
+        console.log('初始',res.authSetting['scope.userLocation'])
+        // res.authSetting['scope.userLocation'] == undefined    表示 初始化进入该页面
+        // res.authSetting['scope.userLocation'] == false    表示 非初始化进入该页面,且未授权
+        // res.authSetting['scope.userLocation'] == true    表示 地理位置授权
+        if (res.authSetting['scope.userLocation'] == false) {
+           
+          wx.showModal({
+            title: '请求授权当前位置',
+            content: '李大人获取您的地理位置，请确认授权',
+            success: function (res) {
+              console.log("res",res)
+              if (res.cancel) {
+                wx.showToast({
+                  title: '拒绝授权',
+                  icon: 'none',
+                  duration: 1000
+                })
+              } else if (res.confirm) {
+                // 打开设置界面进行设置
+                wx.openSetting({
+                  success: function (dataAu) {
+                    console.log('dataAu',dataAu)
+                    if (dataAu.authSetting["scope.userLocation"] == true) {
+                      wx.showToast({
+                        title: '授权成功',
+                        icon: 'success',
+                        duration: 1000
+                      })
+                      //再次授权，调用wx.getLocation的API
+                      wx.getLocation({
+                        type: 'gcj02',
+                        success (res) {
+                          console.log("结果授权成功",res)
+                          // const latitude = res.latitude
+                          // const longitude = res.longitude
+                          // const speed = res.speed
+                          // const accuracy = res.accuracy
+                        },
+                        fail(){
+                          console.log("失败原因",res)
+                        }
+                      })
+                    } else {
+                      wx.showToast({
+                        title: '授权失败',
+                        icon: 'none',
+                        duration: 1000
+                      })
+                    }
+                  }
+                })
+              }
+            }
+          })
+        } else if (res.authSetting['scope.userLocation'] == undefined) {
+          
+          wx.getLocation({
+            type: 'gcj02',
+            success (res) {
+              console.log("结果",res)
+              
+            },
+            fail(){
+              console.log("失败原因",res)
+            }
+          })
+
+        }
+        else if(res.authSetting['scope.userLocation'] == true) {
+           console.log("等于true")
+           wx.getLocation({
+            type: 'gcj02',
+            success (res) {
+              console.log("结果",res)
+              qqmapsdk.reverseGeocoder({
+                location: {
+                  latitude: res.latitude,
+                  longitude: res.longitude
+                },
+                success: function (res) {
+                  //获取当前地址成功
+                  console.log('成功res',res);
+
+                },
+                fail: function (res) {
+                  console.log('失败res',res);
+                  console.log('获取当前地址失败');
+                }
+              });
+
+            },
+            fail(){
+              console.log("失败原因",res)
+            }
+          })
+          //调用wx.getLocation的API
+        }
+      }
+      })
+    },
     methods:{
+      
       // 获取数据列表
       getData(){
         let _this = this;
@@ -122,15 +257,37 @@
     },
     // 触底刷新
     onReachBottom(){
+      console.log("处处第")
       if(this.run == false){
         console.log("跳过")
         return
       }
       this.run = false;
       this.getData()
+    },
+    // 获取滚动条的位置
+    onPageScroll:function(e){ // 获取滚动条当前位置
+      
+      if(this.timer){
+        clearTimeout(this.timer) 
+        if(this.timer == 1){
+        return
+      }
+      }
+      this.timer = setTimeout(() => {
+        this.$store.commit({
+          type:'changeTextScrollDistance',
+          scrollDistance:e.scrollTop
+        });
+      }, 500);
+     
+    },
+    // 申请获取允许小程序使用地理位置权限
+    getPosition(){
+
     }
   }
 </script>
-<style lang="scss">
+<style lang="scss" scope>
   @import './text.scss';
 </style>

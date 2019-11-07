@@ -24,7 +24,7 @@ import commentUserHeader from '@/pages/components/commentUserHeader/index'
   export default{
     data(){
       return {
-        name:'duanziDetail',  // 段子详情页面内容
+        name:'duanziDetail',  // 图片段子详情页面内容
         sid:'',
         dataObject:{} //装载数据的对象
       }

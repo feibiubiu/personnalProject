@@ -1,5 +1,5 @@
 <template>
-  <div class="mod-recommend" id="xxx">
+  <div class="mod-recommend" >
     <div 
       v-for="(item,index) in dataList" 
       :key="index">
@@ -108,7 +108,8 @@ export default {
       run:true ,  // 函数节流开关
       isShowPopup:false,
       makeToAuthorList:["不感兴趣","屏蔽作者","内容重复","内容引起不适"],
-      doIndex:''
+      doIndex:'',
+      timer:null, // 函数防抖定时器
     }
   },
   components:{
@@ -122,11 +123,19 @@ export default {
     }
   },
   created(){
+    this.timer = 1;
+    // 滚动条跳转回离开时的大致位置
+    console.log('recommend',this.$store.state.recommend.scrollDistance)
+    wx.pageScrollTo({
+      scrollTop: this.$store.state.recommend.scrollDistance,
+      duration: 0
+    })
     this.run = false;
     // 防止bug： 当页面滚动条超过一定的长度后，切换页面，再切换回来，就会发生请求数据
     // 防止这个出现
     setTimeout(() => {
       this.run = true;
+      this.timer = null;
     }, 1000);
   },
   methods:{
@@ -201,7 +210,22 @@ export default {
     
     this.run = false;
     this.getData();
-  }
+  },
+  // 获取滚动条的位置
+  onPageScroll:function(e){ // 获取滚动条当前位置 
+    if(this.timer){
+      clearTimeout(this.timer) 
+      if(this.timer == 1){
+        return
+      }
+    }
+    this.timer = setTimeout(() => {
+      this.$store.commit({
+        type:'changeRecommendScrollDistance',
+        scrollDistance:e.scrollTop
+      });
+    }, 500);   
+  },
 
  
 }

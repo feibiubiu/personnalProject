@@ -56,16 +56,23 @@
       dataList:{
         type:Array,
         required:true
+      },
+      index:{
+        type:String || Number,
+        required:true
       }
     },
     created(){
-      //未清楚
-      console.log(this.$store.state.photo.scrollDistance)
-      // wx.pageScrollTo({
-      //   scrollTop: this.$store.state.photo.scrollDistance,
-      //   duration: 0
-      // })
+      this.timer = 1;
+      
+      // 跳转到原来的页面
+      console.log('photo',this.$store.state.photo.scrollDistance)
+      wx.pageScrollTo({
+        scrollTop: this.$store.state.photo.scrollDistance,
+        duration: 0
+      })
 
+     
 
       // 将page页数存到vuex，每次进入页面，都是从vuex拿page
       // 这样就不会请求到相同page的数据，就不会出现相同的数据
@@ -77,6 +84,7 @@
       // 防止这个出现
       setTimeout(() => {
         this.run = true;
+        this.timer = null;
       }, 1000);
       //////////////////
     },
@@ -173,6 +181,10 @@
     },
     // 下拉刷新
     onPullDownRefresh () {
+      // index = 3的时候，才是photo段子页面，所以非photo页面，下拉不刷新数据
+      if(this.index != 3){  
+        return
+      }
       this.page = 1;
       this.$store.commit({
         type:'changePage',
@@ -196,16 +208,20 @@
     },
     // 获取滚动条的位置
     onPageScroll:function(e){ // 获取滚动条当前位置
-      return   
+      
       if(this.timer){
         clearTimeout(this.timer) 
+        console.log("this.timer == 'nodo'",this.timer == 1)
+        if(this.timer == 1){
+          return
+        }
       }
       this.timer = setTimeout(() => {
         this.$store.commit({
-          type:'changeScrollDistance',
+          type:'changePhotoScrollDistance',
           scrollDistance:e.scrollTop
         });
-      }, 200);
+      }, 500);
      
     },
     
